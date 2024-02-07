@@ -1,14 +1,17 @@
+import jwt
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponse
 from django.urls import reverse
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, generics, response, status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser # If used custom user model
 
-from .serializers import UserSerializer
+from .serializers import UserSerializer, EmailVerificationSerializer
 from .utils import Util
 
 
@@ -43,6 +46,28 @@ class CreateUserView(CreateAPIView):
 
         return response.Response({'user_data': user, 'access_token' : str(tokens)}, status=status.HTTP_201_CREATED)
 
+
+class VerifyEmail(GenericAPIView ):
+    serializer_class = EmailVerificationSerializer
+
+    token_param_config = openapi.Parameter(
+        'token', in_=openapi.IN_QUERY, description='Description', type=openapi.TYPE_STRING)
+
+    @swagger_auto_schema(manual_parameters=[token_param_config])
+    def get(self, request):
+        token = request.GET.get('token')
+        try:
+            payload = jwt.decode(token, options={"verify_signature": False})
+            print(payload)
+            user = CustomUser.objects.get(id=payload['user_id'])
+            if not user.is_verified:
+                user.is_verified = True
+                user.save()
+            return response.Response({'email': 'Successfully activated'}, status=status.HTTP_200_OK)
+        except jwt.ExpiredSignatureError as identifier:
+            return response.Response({'error': 'Activation Expired'}, status=status.HTTP_400_BAD_REQUEST)
+        except jwt.exceptions.DecodeError as identifier:
+            return response.Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Zaglushka(generics.ListCreateAPIView):

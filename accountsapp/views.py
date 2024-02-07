@@ -22,6 +22,7 @@ class CreateUserView(CreateAPIView):
         permissions.AllowAny
     ]
     serializer_class = UserSerializer
+    queryset = CustomUser.objects.all()
 
     def post(self, request):
         data = request.data
@@ -44,18 +45,26 @@ class CreateUserView(CreateAPIView):
 
         Util.send_email(data=data)
 
-        return response.Response({'user_data': user, 'access_token' : str(tokens)}, status=status.HTTP_201_CREATED)
+        return response.Response(status=status.HTTP_201_CREATED)
 
 
 class VerifyEmail(GenericAPIView ):
     serializer_class = EmailVerificationSerializer
 
+    email_param_config = openapi.Parameter(
+        'email', in_=openapi.IN_QUERY, description='Email to verify', type=openapi.TYPE_STRING)
+
     token_param_config = openapi.Parameter(
         'token', in_=openapi.IN_QUERY, description='Description', type=openapi.TYPE_STRING)
 
-    @swagger_auto_schema(manual_parameters=[token_param_config])
+    @swagger_auto_schema(manual_parameters=[token_param_config, email_param_config])
     def get(self, request):
+        email = request.GET.get('email')
         token = request.GET.get('token')
+
+        if not email:
+            return response.Response({'error': 'Email is missing'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             payload = jwt.decode(token, options={"verify_signature": False})
             print(payload)
@@ -68,6 +77,8 @@ class VerifyEmail(GenericAPIView ):
             return response.Response({'error': 'Activation Expired'}, status=status.HTTP_400_BAD_REQUEST)
         except jwt.exceptions.DecodeError as identifier:
             return response.Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 
 class Zaglushka(generics.ListCreateAPIView):

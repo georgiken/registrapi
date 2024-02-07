@@ -17,6 +17,9 @@ class CreateUserView(CreateAPIView):
     serializer_class = UserSerializer
 
 
+
+
+
 class Zaglushka(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer

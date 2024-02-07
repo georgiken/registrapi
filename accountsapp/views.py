@@ -37,7 +37,7 @@ class CreateUserView(CreateAPIView):
         current_site = get_current_site(request).domain
         relative_link = reverse('email-verify')
         absurl = 'http://' + current_site + relative_link + "?token=" + str(tokens)
-        email_body = 'Hi ' + user['username'] + \
+        email_body = 'Hi ' + user['username'] + 'your verify token:' + str(tokens) +'   /n   '\
                      ' Use the link below to verify your email \n' + absurl
         data = {'email_body': email_body, 'to_email': user['email'],
                 'email_subject': 'Verify your email'}

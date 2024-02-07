@@ -186,9 +186,9 @@ AUTH_USER_MODEL = 'accountsapp.CustomUser'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_PORT = 2525
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'georgiy.voronin.05@mail.ru'
-EMAIL_HOST_PASSWORD = 'yb3wg9CPc96ea2QBcHAN'
+EMAIL_HOST_USER = 'georgiy.voronin.05@gmail.com'
+EMAIL_HOST_PASSWORD = 'zducitolqthqkjko'

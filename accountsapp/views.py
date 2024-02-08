@@ -1,12 +1,17 @@
 import jwt
+from django.contrib.auth import authenticate
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponse
 from django.urls import reverse
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import permissions, generics, response, status
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
 from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser # If used custom user model
@@ -80,6 +85,26 @@ class VerifyEmail(GenericAPIView ):
         except jwt.exceptions.DecodeError as identifier:
             return response.Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+class UserLoginView(APIView):
+    def post(self, request, format=None):
+        email = request.data.GET('email')
+        password = request.data.GET('password')
+
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class UserDetailView(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, format=None):
+        return Response({'username': request.user.username}, status=status.HTTP_200_OK)
 
 class Zaglushka(generics.ListCreateAPIView):
     queryset = CustomUser.objects.all()

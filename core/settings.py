@@ -192,3 +192,8 @@ EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = 'georgiy.voronin.05@gmail.com'
 EMAIL_HOST_PASSWORD = 'zducitolqthqkjko'
+
+AUTHENTICATION_BACKENDS = [
+    'myapp.adapters.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]

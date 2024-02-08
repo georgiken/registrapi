@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         # Tuple of serialized model fields (see link [2])
-        fields = ( "id", "username", 'email', "password", )
+        fields = ( "id", 'username', 'email', "password", )
 
     def create(self, validated_data):
         validated_data['password'] = make_password(validated_data.get('password'))

@@ -35,8 +35,8 @@ class CreateUserView(CreateAPIView):
         user_email = CustomUser.objects.get(email=user['email'])
         tokens = RefreshToken.for_user(user_email).access_token
         # send email for user verification
-        current_site = get_current_site(request).domain
-        relative_link = reverse('email-verify')
+        # current_site = get_current_site(request).domain
+        # relative_link = reverse('email-verify')
         # absurl = 'http://' + current_site + relative_link + "?token=" + str(tokens)
         email_body = 'Hi ' + user['username'] + ' your verify token:' + str(tokens)
                      # ''' ' Use the link below to verify your email \n' + absurl'''

@@ -89,10 +89,11 @@ class VerifyEmail(GenericAPIView ):
 
 class UserLoginView(APIView):
     def post(self, request, format=None):
-        email = request.data.GET('email')
-        password = request.data.GET('password')
+        email = request.data.get('email')
+        password = request.data.get('password')
 
         user = authenticate(request, username=email, password=password)
+
         if user is not None:
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
